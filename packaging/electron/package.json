@@ -1,0 +1,42 @@
+{
+  "name": "zhongan-agent-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "众安 Agent 桌面客户端",
+  "author": "Zhongan Agent",
+  "main": "main.cjs",
+  "devDependencies": {
+    "electron": "45.2.0",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.zhongan.agent",
+    "productName": "众安 Agent",
+    "executableName": "ZhonganAgent",
+    "directories": {
+      "output": "../../dist/exe"
+    },
+    "files": [
+      "main.cjs",
+      "icon.png",
+      "package.json"
+    ],
+    "win": {
+      "icon": "icon.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "ZhonganAgent-Online-${version}.exe"
+    }
+  },
+  "allowScripts": {
+    "electron@45.2.0": true
+  }
+}

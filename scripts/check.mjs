@@ -42,15 +42,9 @@ const ids = [...staticHtml.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
 const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
 check(duplicates.length === 0, '重复 id：' + [...new Set(duplicates)].join(', '));
 
-/* ── 首页：Agent、设置与银行功能入口 ─ */
+/* ── 首页：清爽 Agent 对话，功能入口只在功能页 ─ */
 for (const required of [
   'class="topbar"', 'data-settings-open',
-  'id="homeFeatures"', 'class="home-hub"', '银行功能',
-  'id="homeAccountsValue"', 'id="homeAssetsValue"', 'id="homeCashflowValue"',
-  'id="homeLoansValue"', 'id="homeWealthValue"', 'id="homePaymentsValue"',
-  'data-feature="accounts"', 'data-feature="assets"', 'data-feature="cashflow"',
-  'data-feature="loans"', 'data-feature="wealth"', 'data-feature="payments"',
-  'href="#/accounts"', 'href="#/assets"', 'href="#/cashflow"', 'href="#/loans"', 'href="#/wealth"', 'href="#/payments"',
   'id="agentConsole"', 'id="agentForm"', 'id="agentInput"', 'id="agentRun"',
   'id="chatTurns"', 'id="welcomeMsg"', 'class="welcome-title"',
   'data-mobile-nav="chat"', 'data-mobile-nav="features"', 'data-mobile-nav="settings"',
@@ -63,9 +57,11 @@ for (const required of [
 }
 check(!html.includes('class="home-feature"') && !html.includes('class="home-features"'), '首页仍保留旧五入口卡片');
 check(!html.includes('homeOverviewValue') && !html.includes('homeBillsValue') && !html.includes('homeSubsValue') && !html.includes('homeCardsValue') && !html.includes('homeTxValue'), '首页仍保留旧功能卡数据位');
-check(html.includes('class="hub-page"') && html.includes('class="bank-entry-grid"'), '功能二级入口不完整');
-check(html.includes('>快捷服务</span>') && html.includes('id="quickServices"'), '首页缺少快捷服务区');
-check(html.includes('data-quick-service-add') && html.includes('renderQuickServices') && html.includes('upsertQuickService'), '快捷服务添加/渲染逻辑不完整');
+check(html.includes('class="hub-page"') && html.includes('class="hub-row-list"'), '功能二级入口不完整');
+check(!html.includes('bank-entry-grid') && !html.includes('id="homeFeatures"'), '对话首页不得再堆功能宫格');
+check(html.includes('id="quickServices"') && html.includes('data-quick-service-add') && html.includes('renderQuickServices') && html.includes('upsertQuickService'), '首页快捷服务（自定义入口）不完整');
+
+
 check(!html.includes('服务索引'), '首页仍保留旧服务索引文案');
 check(!html.includes('class="hub-ai-card"') && !html.includes('data-ai-prompt'), '功能页仍混入 AI 功能卡片');
 const featureRouteMatch = html.match(/var FEATURE_ROUTES = \[([^\]]+)\]/);
@@ -75,7 +71,6 @@ for (const route of ['features', 'accounts', 'assets', 'cashflow', 'loans', 'wea
 }
 check(!html.includes('id="featureRail"') && !html.includes('id="railDetail"') && !html.includes('id="featureScrim"') && !html.includes('class="feature-rail"'), '仍保留右侧功能面板或功能抽屉');
 check(!html.includes('id="pulse"') && !html.includes('id="pulsePayable"') && !html.includes('id="mobileStatus"'), '首页仍保留旧资金概览/状态条');
-check(html.indexOf('id="homeFeatures"') < html.indexOf('id="agentConsole"'), '功能入口卡未排在 Agent 对话之前');
 check(!html.slice(html.indexOf('id="agentConsole"'), html.indexOf('id="featureView"')).includes('data-feature='), '功能入口仍堆在对话内容里');
 check((html.match(/data-ob-slide="/g) || []).length === 4, '新手指引不是 4 页');
 check(!html.includes('data-agent-example'), '仍存在预设对话示例入口');
@@ -493,10 +488,10 @@ async function checkAiToolPath() {
     check(result.body && result.body.ok === true && result.body.source === 'ai', 'AI 模式未返回 source=ai');
     check(result.body && result.body.provider === 'check-model', 'AI 模式未显示实际模型');
     check(calls >= 2, 'Agent 没有先调用工具再生成计划');
-    check(toolsLength === 5, '模型请求未携带 5 个查询工具');
+    check(toolsLength >= 5 && toolsLength === 5 + 9, '模型请求未携带 5 个查询工具 + 9 个动作工具');
     check(toolMessageCount === 5, '工具结果未全部回传模型');
     check(toolText.includes('众微银行') && toolText.includes('微粒贷') && toolText.includes('爱奇艺') && toolText.includes('盒马鲜生'), '工具结果缺少账户/账单/订阅/交易数据');
-    check(systemPrompt.includes('必须调用') && systemPrompt.includes('get_profile') && systemPrompt.includes('get_transactions'), '系统提示未要求先查询数据');
+    check(systemPrompt.includes('工作流') && systemPrompt.includes('get_profile') && systemPrompt.includes('get_transactions') && systemPrompt.includes('transfer_money') && systemPrompt.includes('cancel_subscription'), '系统提示未覆盖查询与动作工具');
     check(!systemPrompt.includes('爱奇艺') && !systemPrompt.includes('436'), '系统提示写入预设场景或答案');
     const queries = result.body && Array.isArray(result.body.queries) ? result.body.queries : [];
     check(queries.length === 5, '响应 queries 不是 5 项');

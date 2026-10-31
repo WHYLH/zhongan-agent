@@ -131,30 +131,8 @@ function userPageWait(page) {
 }
 
 async function waitForHomeData(page) {
-  await page.waitForSelector('#homeFeatures', { state: 'attached' });
-  await page.waitForFunction(() => {
-    const accounts = document.querySelector('#homeAccountsValue');
-    const assets = document.querySelector('#homeAssetsValue');
-    const cashflow = document.querySelector('#homeCashflowValue');
-    const loans = document.querySelector('#homeLoansValue');
-    const wealth = document.querySelector('#homeWealthValue');
-    return accounts && accounts.textContent.includes('众微银行')
-      && assets && /¥[\d,]+\.\d{2}$/.test(assets.textContent.trim())
-      && cashflow && /\d+ 笔/.test(cashflow.textContent)
-      && loans && /¥[\d,]+\.\d{2}$/.test(loans.textContent.trim())
-      && wealth && wealth.textContent.includes('项订阅');
-  }, { timeout: 8000 }).catch(async (error) => {
-    const dump = await page.evaluate(() => ({
-      accounts: document.querySelector('#homeAccountsValue') ? document.querySelector('#homeAccountsValue').textContent : null,
-      assets: document.querySelector('#homeAssetsValue') ? document.querySelector('#homeAssetsValue').textContent : null,
-      cashflow: document.querySelector('#homeCashflowValue') ? document.querySelector('#homeCashflowValue').textContent : null,
-      loans: document.querySelector('#homeLoansValue') ? document.querySelector('#homeLoansValue').textContent : null,
-      wealth: document.querySelector('#homeWealthValue') ? document.querySelector('#homeWealthValue').textContent : null,
-      payments: document.querySelector('#homePaymentsValue') ? document.querySelector('#homePaymentsValue').textContent : null
-    }));
-    console.log('  [debug] home values:', JSON.stringify(dump));
-    throw error;
-  });
+  await page.waitForSelector('#agentConsole', { state: 'attached' });
+  await page.waitForFunction(() => !!document.querySelector('#chatTurns') || !!document.querySelector('#welcomeMsg'), null, { timeout: 8000 });
 }
 
 async function openSettings(page) {
@@ -274,28 +252,19 @@ async function main() {
     ok(await page.locator('#ttsToggleMain').isVisible(), '语音自动朗读开关可见');
     ok((await page.locator('#ttsToggleMain').innerText()).includes('🔊'), 'TTS 自动朗读默认开启');
     ok(await page.locator('#agentConsole').isVisible(), '中央 Agent 可见');
-    ok(await page.locator('#homeFeatures').isVisible(), '对话首页展示六卡功能入口');
-    ok((await page.locator('#homeFeatures .hub-ai-card').count()) === 0, '首页不展示 AI 功能卡片');
-    ok((await page.locator('#homeFeatures .bank-entry').count()) === 6, '首页展示 6 个银行功能入口');
-    const homeText = await page.locator('#homeFeatures').innerText();
+    ok((await page.locator('#homeFeatures').count()) === 0, '对话首页不再堆功能宫格（入口统一在功能页）');
+    ok((await page.locator('.bank-entry').count()) === 0, '首页不出现任何功能入口卡片');
     ok((await page.locator('#agentConsole').innerText()).includes('我是小安'), '小安欢迎区可见');
     ok((await page.locator('#welcomeQuickPrompts .quick-ask').count()) === 4, '对话首页展示 4 个快捷问法');
-    ok((await page.locator('#homeAccountsValue').innerText()).includes('众微银行'), '账号卡展示银行卡所属银行');
-    ok(!(await page.locator('#homeAccountsValue').innerText()).includes('个'), '账号卡不再展示账户数量');
     const liveSummary = await page.evaluate(() => fetch('/api/finance/summary?user=u-lin').then(response => response.json()));
     const yuanText = value => '¥' + Number(value).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    ok((await page.locator('#homeAssetsValue').innerText()).includes(yuanText(liveSummary.totals.assets_yuan)), '资产卡使用 SQLite 总资产');
-    ok((await page.locator('#homeCashflowValue').innerText()).includes(String(liveSummary.counts.transactions)), '收支卡使用 SQLite 流水笔数');
-    ok((await page.locator('#homeLoansValue').innerText()).includes(yuanText(liveSummary.totals.liabilities_yuan)), '贷款卡使用 SQLite 负债');
-    ok(/· ¥[\d,]+\.\d{2}$/.test((await page.locator('#homeWealthValue').innerText()).trim()) && /项订阅/.test((await page.locator('#homeWealthValue').innerText())), '理财卡展示订阅与定期存款');
-    ok(/^\d+ 项固定缴纳$/.test((await page.locator('#homePaymentsValue').innerText()).trim()), '服务入口展示固定缴纳数');
     ok((await page.locator('.home-feature').count()) === 0, '首页不再出现旧五入口卡片');
     ok((await page.locator('#homeOverviewValue').count()) === 0, '首页不再出现旧总览卡');
     ok((await page.locator('#featureRail').count()) === 0, '首页没有右侧功能面板');
     ok((await page.locator('#pulse').count()) === 0, '首页没有旧资金概览条');
     ok((await page.locator('#mobileStatus').count()) === 0, '首页没有旧移动状态条');
-    ok((await page.locator('#homeFeatures').innerText()).includes('快捷服务'), '对话首页展示快捷服务区');
-    ok((await page.locator('#homeFeatures .bank-entry').count()) === 6, '快捷服务不挤占 6 个银行功能入口');
+    ok((await page.locator('#quickServices .bank-entry').count()) === 0, '快捷服务区不含功能宫格');
+    ok((await page.locator('#quickServices .quick-service-new').count()) === 1, '快捷服务区保留手动添加入口');
     await page.locator('[data-quick-service-add]').click();
     await page.locator('#quickServiceName').fill('每月账单');
     await page.locator('#quickServiceAction').fill('#/cashflow');
@@ -318,6 +287,10 @@ async function main() {
     console.log('\n[3] 六个银行功能页、账号下钻与旧路由兼容');
     await openFeatures(page);
     ok((await page.locator('#featurePageBody .hub-row').count()) === 6, '功能页一行一个展示 6 个功能');
+    ok((await page.locator('#featurePageBody .hub-row').first().innerText()).includes('众微银行'), '账号行展示银行卡所属银行');
+    ok((await page.locator('#featurePageBody .hub-row').nth(1).innerText()).includes(yuanText(liveSummary.totals.assets_yuan)), '资产行使用 SQLite 总资产');
+    ok((await page.locator('#featurePageBody .hub-row').nth(2).innerText()).includes(String(liveSummary.counts.transactions) + ' 笔'), '收支行使用 SQLite 流水笔数');
+    ok((await page.locator('#featurePageBody .hub-row').nth(3).innerText()).includes(yuanText(liveSummary.totals.liabilities_yuan)), '贷款行使用 SQLite 负债');
     ok((await page.locator('#featurePageBody .hub-ai-card').count()) === 0, '功能页不混入 AI 功能入口');
     await page.locator('#featurePageBody .hub-row[data-feature="payments"]').click();
     await expectFeature(page, 'payments', '服务', '/api/finance/subscriptions', '#featurePageBody .sheet-hero');
@@ -594,7 +567,7 @@ async function main() {
     ok((await page.locator('[data-agent-retry]').count()) === 1, '失败消息提供重试按钮');
     ok((await page.locator('#agentDriver').innerText()).includes('调用失败'), '状态标签显示调用失败');
     ok(await page.locator('#welcomeMsg').isHidden(), '发送后欢迎区收起');
-    ok(await page.locator('#homeFeatures').isHidden(), '对话后首页仍保持清爽');
+    ok((await page.locator('.bank-entry').count()) === 0, '对话后首页仍保持清爽');
     await page.locator('[data-agent-retry]').click();
     await page.waitForFunction(() => {
       return document.querySelectorAll('.msg.error').length === 1 && !document.getElementById('agentThinking');
@@ -678,8 +651,12 @@ async function main() {
     await waitForHomeData(mobilePage);
     ok((await mobilePage.evaluate(() => document.documentElement.getAttribute('data-layout'))) === 'mobile', '390 使用竖屏布局');
     ok(await mobilePage.locator('.topbar').isVisible(), '竖屏顶部品牌可见');
-    ok(await mobilePage.locator('#homeFeatures').isHidden(), '竖屏对话首页保持清爽');
-    ok((await mobilePage.locator('#homeFeatures .bank-entry').count()) === 6, '竖屏首页展示 6 个银行入口');
+    ok((await mobilePage.locator('.bank-entry').count()) === 0, '竖屏对话首页保持清爽');
+    await mobilePage.locator('[data-mobile-nav="features"]').click();
+    await mobilePage.waitForSelector('#featurePageBody .hub-row');
+    ok((await mobilePage.locator('#featurePageBody .hub-row').count()) === 6, '竖屏功能页展示 6 个银行入口');
+    await mobilePage.locator('[data-mobile-nav="chat"]').click();
+    await mobilePage.waitForTimeout(300);
     ok(await mobilePage.locator('#agentConsole').isVisible(), '中央 Agent 可见');
     ok(await mobilePage.locator('.mobile-nav').isVisible(), '底部导航可见');
     ok((await mobilePage.locator('#featureRail').count()) === 0, '竖屏没有抽屉面板');

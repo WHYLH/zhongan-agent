@@ -10,13 +10,13 @@ const stamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
 const archive = path.join(OUT_DIR, `zhongan-bank-agent-${stamp}.zip`);
 const excluded = new Set(['.git', 'node_modules', 'models', 'tmp', 'submission-output', 'redesign-obsidian', 'icbc-capture', '.zip-inspect', 'server-mjs-恢复存档', 'vendor', 'torchinductor_whylh', '.mimosa', '.zcode', '.zcode-probe-data', '.zcode-proxy-data',
   '.index-backup-pre-kimi.html', '.recovered-lines.json', '.original-server-recovered-v2.mjs', '.dispatch-task.txt', 'SERVER_OPS.md',
-  'dist', 'output', 'node-runtime', '.gradle', 'build', 'github-ready',
+  'dist', 'output', 'node-runtime', '.gradle', 'build', 'github-ready', '__pycache__', '02-答辩材料', '上传文件', 'zhongan-bank-agent-source.zip',
   // 内部开发过程稿：只保留技术/规划/测试/部署文档，过程叙事不进入评委可见材料
   '01_后端执行目标与验收.md', '02_前端设计AI文稿.md', '03_设计说明.md', '03_前端设计稿.html', 'QA_NOTES.md',
   'AI_AGENT_UPDATE_REPORT.md', 'FLASH_FINAL_REWORK.md', 'HOME_REDESIGN_REPORT.md', 'LONG_WORK_LOG.md',
   'PROMPT_ARCH_RESEARCH_20261028.md', 'THEME_UPDATE_REPORT.md', 'ZCODE_LOG_AUDIT_20261027.md',
-  'ICBC_DESIGN_NOTES.md', 'RESEARCH_REVOLUT_WEBANK_GITHUB.md', 'adversarial-review-zhongan.md', 'flash-adversarial-review.md']);
-const excludedFile = /(?:\.log$|\.(?:png|jpe?g|webp)$|^\.shot-|ai-config\.local\.json$|^local\.properties$|^gradle\.properties$)/i;
+  'ICBC_DESIGN_NOTES.md', 'RESEARCH_REVOLUT_WEBANK_GITHUB.md', 'COMPETITION_ALIGNMENT_REPORT.md', 'AI_BANKING_AGENT_SECURITY.md', 'adversarial-review-zhongan.md', 'flash-adversarial-review.md']);
+const excludedFile = /(?:\.log$|\.(?:png|jpe?g|webp|pyc)$|^\.shot-|ai-config\.local\.json$|^local\.properties$|^gradle\.properties$)/i;
 
 function copyTree(source, target) {
   fs.mkdirSync(target, { recursive: true });
@@ -42,15 +42,22 @@ fs.writeFileSync(path.join(STAGE, 'SUBMISSION_MANIFEST.txt'), [
   '已排除：node_modules、本地模型权重、EXE/APK 构建产物、.git、tmp、日志、截图和本机密钥',
   '包含：源码、SQLite 演示数据、README、技术文档（output/pdf）、部署与打包配置、测试脚本',
   '启动：npm install && npm run db:check && npm start',
-  '测试：npm run check && npm run smoke（333 条）&& npm run im:check（55 条）&& npm run visitor:check（25 条）',
+  '测试：npm run check && npm run smoke（329 条）&& npm run im:check（55 条）&& npm run visitor:check（25 条）',
   'GitHub 仓库：见 参赛材料/03-源代码与部署材料/README.md 第 8 节'
 ].join('\n') + '\n', 'utf8');
 
-const psQuote = value => "'" + String(value).replace(/'/g, "''") + "'";
-const result = spawnSync('powershell.exe', ['-NoProfile', '-Command', [
-  'Add-Type -AssemblyName System.IO.Compression.FileSystem',
-  'if (Test-Path -LiteralPath ' + psQuote(archive) + ') { Remove-Item -LiteralPath ' + psQuote(archive) + ' -Force }',
-  '[System.IO.Compression.ZipFile]::CreateFromDirectory(' + psQuote(STAGE) + ', ' + psQuote(archive) + ')'
-].join('; ')], { stdio: 'inherit', windowsHide: true });
+const zipScript = [
+  "import os, sys, zipfile",
+  "stage, archive = sys.argv[1], sys.argv[2]",
+  "if os.path.exists(archive): os.remove(archive)",
+  "with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as zf:",
+  "    for root, dirs, files in os.walk(stage):",
+  "        dirs.sort(); files.sort()",
+  "        for name in files:",
+  "            full = os.path.join(root, name)",
+  "            arc = os.path.relpath(full, stage).replace(os.sep, '/')",
+  "            zf.write(full, arc)"
+].join('\n');
+const result = spawnSync('python', ['-c', zipScript, STAGE, archive], { stdio: 'inherit', windowsHide: true });
 if (result.status !== 0) throw new Error(`提交包生成失败：${result.status}`);
 console.log(archive);

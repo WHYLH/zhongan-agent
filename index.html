@@ -62,42 +62,7 @@
     <h1 class="sr-only">众安 · AI 移动银行</h1>
 
     <section class="agent-view" id="agentView" aria-label="小安对话工作区">
-      <section class="home-hub" id="homeFeatures" aria-label="功能首页">
-        <div class="hub-block">
-          <div class="hub-block-head">
-            <span class="hub-kicker">快捷服务</span>
-            <span class="hub-caption" id="homeBankMeta">账户与卡片</span>
-          </div>
-          <nav class="bank-entry-grid" aria-label="银行功能入口">
-            <a class="bank-entry" href="#/accounts" data-feature="accounts" aria-label="账号">
-              <span class="bank-entry-ic"><svg class="obs-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#i-accounts"></use></svg></span>
-              <b>账号</b><em id="homeAccountsValue">读取中…</em>
-            </a>
-            <a class="bank-entry" href="#/assets" data-feature="assets" aria-label="资产">
-              <span class="bank-entry-ic"><svg class="obs-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#i-assets"></use></svg></span>
-              <b>资产</b><em id="homeAssetsValue">读取中…</em>
-            </a>
-            <a class="bank-entry" href="#/cashflow" data-feature="cashflow" aria-label="收支">
-              <span class="bank-entry-ic"><svg class="obs-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#i-cashflow"></use></svg></span>
-              <b>收支</b><em id="homeCashflowValue">读取中…</em>
-            </a>
-            <a class="bank-entry" href="#/loans" data-feature="loans" aria-label="贷款">
-              <span class="bank-entry-ic"><svg class="obs-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#i-loans"></use></svg></span>
-              <b>贷款</b><em id="homeLoansValue">读取中…</em>
-            </a>
-            <a class="bank-entry" href="#/wealth" data-feature="wealth" aria-label="理财">
-              <span class="bank-entry-ic"><svg class="obs-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#i-wealth"></use></svg></span>
-              <b>理财</b><em id="homeWealthValue">读取中…</em>
-            </a>
-            <a class="bank-entry" href="#/payments" data-feature="payments" aria-label="服务">
-              <span class="bank-entry-ic"><svg class="obs-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#i-payments"></use></svg></span>
-              <b>服务</b><em id="homePaymentsValue">读取中…</em>
-            </a>
-          </nav>
-          <div class="quick-services" id="quickServices" aria-label="我的快捷服务"></div>
-        </div>
-      </section>
-
+      <div class="quick-services" id="quickServices" aria-label="我的快捷服务"></div>
       <section class="chat" id="agentConsole" aria-labelledby="agentTitle">
         <header class="chat-head">
           <div class="chat-title">
@@ -325,7 +290,7 @@
     tts: 'fund-tts-autoplay',
     notes: 'fund-notes-v1',
     elder: 'fund-elder-v1',
-    voice: 'fund-tts-voice-v2',
+    voice: 'fund-tts-voice-v3',
     speed: 'fund-tts-speed',
     tone: 'fund-tts-tone',
     preset: 'fund-ai-preset',
@@ -549,7 +514,7 @@
     return (readStore(STORE.preset, 'siliconflow') || 'siliconflow') === 'siliconflow';
   }
   function ttsVoiceValue() {
-    return readStore(STORE.voice, 'Serena') || 'Serena';
+    return readStore(STORE.voice, 'Uncle_Fu') || 'Uncle_Fu';
   }
   function ttsToneValue() {
     return readStore(STORE.tone, '用温柔亲切的语气说') || '用温柔亲切的语气说';
@@ -3075,7 +3040,7 @@
     var totals = summary.totals || {};
     var counts = summary.counts || {};
     var values = {
-      accounts: bankCardItems(data).length + ' 张银行卡',
+      accounts: bankCardBankLabel(bankCardItems(data)) || '银行卡管理',
       assets: money(totals.assets_yuan, 2),
       cashflow: (counts.transactions || 0) + ' 笔流水',
       loans: money(totals.liabilities_yuan, 2),
@@ -3722,6 +3687,7 @@
         if (item.operation === 'remove') service.operation = 'remove';
         upsertQuickService(service);
       }
+
     });
     if (policy) applyPolicy(policy);
     var showPolicy = (result.executed || []).some(function (item) { return item.kind === 'policy' && item.showPolicy; });
@@ -5381,12 +5347,6 @@
         else if (quickText) submitPrompt(quickText);
         return;
       }
-      var quickPrompt = target.closest('[data-quick-prompt]');
-      if (quickPrompt) {
-        event.preventDefault();
-        submitPrompt(quickPrompt.getAttribute('data-quick-prompt') || '');
-        return;
-      }
       var followup = target.closest('[data-followup-text]');
       if (followup) {
         event.preventDefault();
@@ -6002,7 +5962,9 @@
   function renderQuickServices() {
     var root = $('#quickServices');
     if (!root) return;
-    var html = readQuickServices().map(function (item) {
+    var list = readQuickServices();
+    var html = list.length ? '<span class="quick-services-kicker">快捷服务</span>' : '';
+    html += list.map(function (item) {
       return '<span class="quick-service-item">' +
         '<button type="button" class="quick-service" data-quick-service-route="' + escapeHtml(item.route || '') + '" data-quick-service-prompt="' + escapeHtml(item.prompt || '') + '">' + escapeHtml(item.label) + '</button>' +
         '<button type="button" class="quick-service-del" data-quick-service-remove="' + escapeHtml(item.id || '') + '" aria-label="移除' + escapeHtml(item.label) + '">×</button>' +
@@ -6046,7 +6008,6 @@
     upsertQuickService({ label: label, route: route, prompt: route ? '' : action });
     return true;
   }
-
   function scheduleGreetingSpeech(greeting) {
     var tries = 0;
     function speakWhenReady() {

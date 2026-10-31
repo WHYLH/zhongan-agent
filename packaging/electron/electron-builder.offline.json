@@ -1,0 +1,61 @@
+{
+  "appId": "com.zhongan.agent.offline",
+  "productName": "众安 Agent 离线版",
+  "executableName": "ZhonganAgent",
+  "directories": {
+    "output": "../../dist/exe"
+  },
+  "files": [
+    "main.cjs",
+    "icon.png",
+    "package.json"
+  ],
+  "extraResources": [
+    {
+      "from": "../../server.mjs",
+      "to": "app-server/server.mjs"
+    },
+    {
+      "from": "../../db.mjs",
+      "to": "app-server/db.mjs"
+    },
+    {
+      "from": "../../channels",
+      "to": "app-server/channels"
+    },
+    {
+      "from": "../../index.html",
+      "to": "app-server/index.html"
+    },
+    {
+      "from": "../../styles",
+      "to": "app-server/styles"
+    },
+    {
+      "from": "../../assets",
+      "to": "app-server/assets"
+    },
+    {
+      "from": "../../data/finance.sqlite",
+      "to": "app-server/data/finance.sqlite"
+    },
+    {
+      "from": "node-runtime/node.exe",
+      "to": "runtime/node.exe"
+    }
+  ],
+  "win": {
+    "icon": "icon.ico",
+    "target": [
+      {
+        "target": "portable",
+        "arch": [
+          "x64"
+        ]
+      }
+    ]
+  },
+  "portable": {
+    "artifactName": "ZhonganAgent-Offline-${version}.exe"
+  }
+}
