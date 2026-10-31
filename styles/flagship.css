@@ -1,0 +1,211 @@
+/* 日间旗舰精修：定制图标、评估仪、清晰下钻与手机画布 */
+.obs-icon{width:22px;height:22px;fill:none;stroke:currentColor;flex:none}
+.brand-mark .obs-icon,.spark-mark .obs-icon{width:23px;height:23px}
+.welcome-avatar .obs-icon{width:27px;height:27px}
+.tts-auto-toggle .obs-icon{width:18px;height:18px}
+.bank-dialog-x .obs-icon{width:17px;height:17px}
+.row-go .obs-icon{width:17px;height:17px}
+.hub-index{font:11px var(--numeric);color:var(--muted);letter-spacing:.08em}
+.hub-row-copy{display:grid;gap:5px;flex:1;min-width:0}
+.hub-row-copy small{font-size:11px;color:var(--muted);line-height:1.45;white-space:nowrap}
+.hub-row-copy em{font:11px var(--numeric);font-style:normal;color:var(--accent-2);line-height:1.5;white-space:nowrap}
+.hub-page::before{display:none}
+.feature-page-head .eyebrow:empty{display:none}
+.hub-page{gap:16px}
+.hub-row .bank-entry-ic{transition:border-color .22s ease,background .22s ease}
+.hub-row .obs-icon,.bank-entry .obs-icon{transition:transform .24s cubic-bezier(.2,.8,.2,1)}
+.hub-row:hover .obs-icon,.bank-entry:hover .obs-icon{transform:translateY(-2px)}
+.hub-row:hover .bank-entry-ic{border-color:var(--line-strong);background:var(--mint)}
+.welcome-copy{animation:flagship-copy-in .55s cubic-bezier(.2,.8,.2,1) both}
+.welcome-avatar{animation:flagship-emblem-in .6s cubic-bezier(.2,.8,.2,1) both}
+.obs-avatar-orbit{animation:flagship-orbit 24s linear infinite}
+@keyframes flagship-copy-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes flagship-emblem-in{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+@keyframes flagship-orbit{to{transform:rotate(360deg)}}
+
+/* 日间模式的材质来自暖灰层差，不来自浓阴影 */
+html[data-theme="light"] body::before{background:radial-gradient(900px 600px at 92% -10%,rgba(133,102,49,.07),transparent 68%)}
+html[data-theme="light"] .chat,html[data-theme="light"] .obs-chart-shell{box-shadow:0 1px 0 rgba(255,255,255,.8),0 12px 34px rgba(38,34,25,.025)}
+html[data-theme="light"] .bank-card-tile,html[data-theme="light"] .acct-card-hero{border-color:rgba(220,193,139,.32)}
+html[data-theme="light"] .welcome-avatar{background:var(--emblem-bg);color:var(--emblem-ink);border-color:var(--emblem-border);box-shadow:var(--emblem-shadow)}
+
+/* 弹层骨架：关闭入口独立于不断更换的内容 */
+.bank-dialog-shell{position:relative;width:min(430px,100%);max-height:min(88dvh,900px);display:flex;filter:drop-shadow(0 24px 64px rgba(0,0,0,.18))}
+.bank-dialog-shell .bank-dialog{width:100%;max-height:min(88dvh,900px);padding-top:52px;filter:none;box-shadow:var(--shadow)}
+.bank-dialog-x{position:absolute;top:10px;right:10px;z-index:8;width:36px;height:36px;min-height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);color:var(--muted);transition:background .18s ease,color .18s ease,border-color .18s ease}
+.bank-dialog-x:hover{color:var(--accent-2);border-color:var(--line-strong);background:var(--mint)}
+.bank-dialog .lpd-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bank-dialog .lpd-cell{min-width:0;padding:12px}
+.bank-dialog .lpd-cell i{font-size:11px;color:var(--muted);line-height:1.5}
+.bank-dialog .lpd-cell b,.bank-dialog .lpd-cell b[style]{font-size:12px!important;line-height:1.6;overflow-wrap:anywhere;white-space:normal}
+.bank-dialog .pd-rich h3{padding-right:18px}
+.bank-dialog{overflow-x:hidden}
+.bank-dialog .pd-timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;overflow:visible;gap:4px}
+.bank-dialog .pd-step{min-width:0}
+.bank-dialog .pd-step b,.bank-dialog .pd-step small{white-space:normal;line-height:1.45;overflow-wrap:anywhere}
+.bank-dialog .pd-timeline em{display:none}
+
+/* 贷款评估仪：三层真实阶段，而非虚构进度 */
+.loan-eval{gap:14px;padding:4px 0 2px;align-items:center}
+.loan-eval-instrument{position:relative;width:168px;height:168px;display:grid;place-items:center;margin:0 0 4px;border:1px solid var(--line);border-radius:50%;background:radial-gradient(circle,var(--mint-soft),transparent 64%)}
+.loan-eval-instrument::before{content:"";position:absolute;inset:17px;border:1px solid var(--line);border-radius:50%;opacity:.35}
+.loan-eval-orbit{position:absolute;inset:4px;border-radius:50%;animation:flagship-orbit 12s linear infinite}
+.loan-eval-orbit i{position:absolute;width:5px;height:5px;background:var(--accent);transform:rotate(45deg);box-shadow:0 0 0 4px var(--surface)}
+.loan-eval-orbit i:first-child{top:15px;left:27px}
+.loan-eval-orbit i:last-child{right:14px;bottom:33px;background:var(--muted)}
+.loan-eval-ring{width:94px;height:94px;background:conic-gradient(from 30deg,var(--accent) 0 18%,var(--line) 18% 100%);animation:none;box-shadow:none}
+.loan-eval-ring::after{inset:3px;background:var(--surface);border:1px solid var(--line)}
+.loan-eval-core{display:grid;place-items:center;animation:none;color:var(--accent-2)}
+.loan-eval-core .obs-icon{width:35px;height:35px}
+.loan-eval-axis{display:none}
+.loan-eval-axis.axis-x{width:196px;height:1px;left:-14px;top:83px}
+.loan-eval-axis.axis-y{height:196px;width:1px;top:-14px;left:83px}
+.loan-eval>.eyebrow{font:11px var(--numeric);letter-spacing:.14em;color:var(--muted)}
+.loan-eval h3{font-size:21px;font-weight:500;letter-spacing:.02em}
+.loan-eval-step{margin:0;color:var(--muted);font-size:13px;min-height:20px}
+.loan-eval-track{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;margin-top:8px;border-top:1px solid var(--line)}
+.loan-eval-track li{position:relative;display:grid;justify-items:center;gap:7px;padding:16px 4px 2px;color:var(--muted);text-align:center;font-size:11px;line-height:1.5;transition:color .24s ease}
+.loan-eval-track li::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;background:transparent;transition:background .24s ease}
+.loan-eval-track li i{font:11px var(--numeric);font-style:normal;color:var(--muted)}
+.loan-eval-track li.active{color:var(--accent-2)}
+.loan-eval-track li.active::before,.loan-eval-track li.done::before{background:var(--accent)}
+.loan-eval-track li.active i{color:var(--accent-2)}
+.loan-eval-track li.done i{color:var(--success)}
+.loan-eval-bar{display:none}
+.loan-eval-bar i{width:30%;background:var(--accent);animation:loan-scan 1.7s ease-in-out infinite}
+@keyframes loan-scan{0%{transform:translateX(-100%)}100%{transform:translateX(430%)}}
+@keyframes flagship-counter-orbit{to{transform:rotate(-360deg)}}
+.loan-eval-reveal{animation:loan-result-in .42s cubic-bezier(.2,.8,.2,1) both}
+.loan-eval-gauge{margin:6px 0 12px}
+.loan-eval-gauge svg{overflow:visible}
+.loan-eval-gauge b{color:var(--accent-2);text-shadow:none;font-family:var(--numeric);font-weight:500}
+.loan-eval-gauge svg path:last-child{stroke-dashoffset:0;filter:drop-shadow(0 2px 2px rgba(133,102,49,.12))}
+.loan-answer-chips.is-stack .loan-answer-chip{min-height:48px;border-radius:9px;background:var(--surface-2);transition:border-color .18s ease,background .18s ease,transform .18s ease}
+.loan-answer-chips.is-stack .loan-answer-chip:hover{border-color:var(--line-strong);background:var(--mint);transform:translateX(2px)}
+.loan-answer-chip.on{color:var(--accent-ink)!important}
+@keyframes loan-result-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* 资产：一份主总额，图例与下钻共用同一口径 */
+.obs-chart-detail{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:11px;white-space:nowrap}
+.obs-chart-detail .obs-icon{width:16px;height:16px}
+.obs-chart-detail:hover{border-color:var(--line-strong);color:var(--accent-2);background:var(--mint-soft)}
+.obs-asset-detail-list{display:grid;margin-top:14px;border-top:1px solid var(--line)}
+.obs-asset-detail-row{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid var(--line)}
+.obs-detail-icon{width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;color:var(--accent-2);background:var(--mint-soft)}
+.obs-detail-icon .obs-icon{width:17px;height:17px}
+.obs-detail-copy{display:grid;gap:3px;min-width:0}
+.obs-detail-copy b{font-size:12px;line-height:1.55;font-weight:600;overflow-wrap:anywhere}
+.obs-detail-copy small{font-size:11px;color:var(--muted)}
+.obs-asset-detail-row>strong{font:500 12px var(--numeric);white-space:nowrap}
+.obs-legend-item span{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.5}
+
+/* 桌面内的竖屏预览：画布与覆盖层都属于手机，而不是横向工作台 */
+@media (min-width:981px){
+  body.portrait-preview .app{width:400px!important;height:min(858px,calc(100dvh - 48px))!important;padding:0!important;border-radius:30px!important}
+  body.portrait-preview .agent-view{display:flex!important;flex-direction:column!important;padding:0!important;overflow:hidden!important}
+  body.portrait-preview .agent-view[hidden]{display:none!important}
+  body.portrait-preview .chat{order:0;flex:1;min-height:0!important;border:0!important;border-radius:0!important}
+  body.portrait-preview .home-hub{order:1;height:auto;padding:8px 20px 20px}
+  body.portrait-preview #homeFeatures{display:none!important}
+  body.portrait-preview .thread{padding:30px 20px 16px}
+  body.portrait-preview .welcome{margin:0;align-items:flex-start;text-align:left}
+  body.portrait-preview .thread:has(> .welcome:not([hidden])) .welcome{margin:auto 0}
+  body.portrait-preview .welcome-title,body.portrait-preview .welcome-title span{font-size:27px}
+  body.portrait-preview .welcome::after{display:none}
+  body.portrait-preview .feature-page-body{padding-right:20px!important}
+  body.portrait-preview .obs-asset-layout{grid-template-columns:1fr!important;gap:20px}
+  body.portrait-preview .obs-chart-head{align-items:flex-start;flex-direction:column;gap:8px}
+  body.portrait-preview .obs-chart-legend{grid-template-columns:1fr;gap:12px}
+  body.portrait-preview .obs-legend-item{grid-template-columns:6px minmax(0,1fr) auto;font-size:12px;gap:9px}
+  body.portrait-preview .obs-legend-item b{grid-column:3;font-size:12px}
+  body.portrait-preview .obs-asset-composition{width:148px;height:148px}
+  body.portrait-preview .obs-chart-number{font-size:17px}
+  body.portrait-preview .obs-chart-shell{padding:18px 14px}
+  body.portrait-preview .hub-row-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body.portrait-preview .hub-index{display:none}
+  body.portrait-preview .hub-row{padding:18px 12px;gap:10px}
+  body.portrait-preview .hub-row-copy b{font-size:15px;white-space:nowrap}
+  body.portrait-preview .bank-dialog-shell{width:calc(400px - 28px);max-height:calc(100dvh - 72px)}
+  body.portrait-preview .bank-dialog{width:100%;max-height:calc(100dvh - 72px);padding:48px 20px 20px}
+  body.portrait-preview .bank-dialog .bd-row2{grid-template-columns:1fr}
+  body.portrait-preview .bank-dialog .bd-form{display:contents}
+  body.portrait-preview .bank-dialog .bd-actions{position:sticky;bottom:-20px;background:var(--surface);padding-top:14px;z-index:3}
+}
+html[data-layout="mobile"] .bank-dialog-shell{width:calc(100vw - 28px);max-height:calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom))}
+html[data-layout="mobile"] .bank-dialog{max-height:calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom));padding-top:48px}
+html[data-layout="mobile"] .bank-dialog-x{top:8px;right:8px;width:38px;height:38px;min-height:38px}
+html[data-layout="mobile"] .hub-row-copy b{font-size:16px}
+html[data-layout="mobile"] .hub-row-copy small{font-size:11px}
+html[data-layout="mobile"] .feature-page-body{padding-right:20px}
+html[data-layout="mobile"] #featureView[data-route="assets"] .feature-page-body,html[data-layout="mobile"] #featureView[data-route="cashflow"] .feature-page-body{padding-right:20px}
+html[data-layout="mobile"] .agent-fab{right:12px;bottom:82px;width:42px;height:42px;opacity:.88}
+html[data-layout="mobile"] body[data-view="feature"] .agent-fab{display:flex}
+html[data-layout="mobile"] body[data-view="agent"] .agent-fab{display:none}
+html[data-layout="mobile"] .thread:has(> .welcome:not([hidden])) .welcome{margin:auto 0}
+html[data-layout="mobile"] .agent-fab:hover{opacity:1}
+html[data-layout="mobile"] .obs-chart-shell{position:relative}
+html[data-layout="mobile"] .obs-asset-detail-row{grid-template-columns:30px minmax(0,1fr);gap:10px}
+html[data-layout="mobile"] .obs-asset-detail-row>strong{grid-column:2;font-size:13px}
+html[data-layout="mobile"] .obs-legend-item{font-size:12px}
+html[data-layout="mobile"] .obs-legend-item b{font-size:12px;white-space:nowrap}
+html[data-layout="mobile"] .loan-eval-track li{font-size:11px}
+@media (min-width:761px) and (max-width:980px){
+  html[data-layout="mobile"] body.portrait-preview .agent-view{display:flex!important;padding:0!important}
+}
+@media(max-width:380px){
+  html[data-layout="mobile"] .hub-row{padding:16px 10px;gap:8px}
+  html[data-layout="mobile"] .hub-row-copy b{font-size:15px}
+  html[data-layout="mobile"] .hub-row-copy small{font-size:11px}
+  html[data-layout="mobile"] .bank-dialog .lpd-grid{grid-template-columns:1fr}
+  html[data-layout="mobile"] .loan-eval-instrument{width:148px;height:148px}
+  html[data-layout="mobile"] .loan-eval-axis.axis-x{width:168px;left:-10px;top:73px}
+  html[data-layout="mobile"] .loan-eval-axis.axis-y{height:168px;top:-10px;left:73px}
+}
+@media(max-height:720px) and (max-width:760px){
+  html[data-layout="mobile"] .thread:has(> .welcome:not([hidden])) .welcome{margin:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .obs-avatar-orbit,.loan-eval-orbit,.loan-eval-ring,.loan-eval-core,.loan-eval-bar i{animation:none!important}
+  .loan-eval-track li{transition:none}
+}
+
+/* 浅色模式：左上角品牌标改为暖浅色调，避免深色色块压在雾银底上 */
+html[data-theme="light"] .brand-mark{
+  background:var(--emblem-bg);
+  color:var(--emblem-ink);
+  border-color:var(--emblem-border);
+  box-shadow:var(--emblem-shadow);
+}
+
+/* 默认模型说明（引导结束后的首次提示） */
+.model-notice-card{
+  position:relative;
+  z-index:1;
+  width:min(460px,calc(100vw - 28px));
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:26px 26px 22px;
+  box-shadow:0 28px 80px rgba(15,18,20,.22);
+}
+.model-notice-card h2{margin:6px 0 14px;font-size:22px;letter-spacing:.01em}
+.model-notice-card p{margin:0 0 12px;font-size:13px;line-height:1.75;color:var(--ink-soft)}
+.model-notice-card p b{color:var(--ink);font-weight:600}
+.model-notice-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.model-notice-actions .btn-ghost,.model-notice-actions .btn-primary{min-height:42px;padding:0 18px}
+
+/* 产品详情等业务弹层打开时，悬浮球与悬浮对话仍需保持可呼出 */
+body:has(#bankDialogRoot:not([hidden])) .agent-fab{z-index:96}
+body:has(#bankDialogRoot:not([hidden])) .fab-scrim{z-index:97}
+body:has(#bankDialogRoot:not([hidden])) .fab-chat{z-index:98}
+html[data-layout="mobile"] body:has(#bankDialogRoot:not([hidden])) .agent-fab{
+  top:calc(14px + env(safe-area-inset-top))!important;right:60px!important;bottom:auto!important;left:auto!important;
+  width:36px;height:36px;transform:none!important;
+}
+
+/* 设置页渠道绑定 */
+.channel-bind-head{display:flex;flex-direction:column;gap:2px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.channel-bind-head b{font-size:12px;color:var(--ink)}
+.channel-bind-head span{font-size:11px;color:var(--muted);line-height:1.45}
+.channel-bind-list{margin-top:4px}
+.channel-bind-row{margin-top:8px}
