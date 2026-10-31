@@ -1,0 +1,31 @@
+{
+  "name": "zhongan-agent",
+  "version": "2.2.0",
+  "private": true,
+  "type": "module",
+  "description": "众安：接入了 AI 的移动银行，先查询资金档案再用对话办业务。",
+  "scripts": {
+    "start": "node scripts/start-with-free-model.mjs",
+    "share:mobile": "node scripts/share-mobile.mjs",
+    "proxy": "node ../scripts/zcode-proxy.mjs",
+    "check": "node --check server.mjs && node --check db.mjs && node --check channels/im.mjs && node --check scripts/im-check.mjs && node --check scripts/im-demo.mjs && node --check scripts/visitor-check.mjs && node --check scripts/prune-visitors.mjs && node scripts/check.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "im:check": "node scripts/im-check.mjs",
+    "im:demo": "node scripts/im-demo.mjs",
+    "visitor:check": "node scripts/visitor-check.mjs",
+    "visitor:prune": "node scripts/prune-visitors.mjs",
+    "db:seed": "node scripts/seed-db.mjs",
+    "db:check": "node scripts/seed-db.mjs --verify-only",
+    "db:info": "node db.mjs",
+    "package:submission": "node scripts/package-submission.mjs",
+    "tts:setup": "node scripts/setup-tts.mjs",
+    "tts:cosyvoice": "python scripts/setup-cosyvoice.py",
+    "tts:qwen": "python scripts/setup-qwen-tts.py"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.55.0"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}

@@ -1,0 +1,11 @@
+node_modules/
+models/
+.jscheck*
+.shot-*
+*.log
+tmp/
+submission-output/
+dist/
+data/ai-config.local.json
+.mimosa/
+.zcode/
